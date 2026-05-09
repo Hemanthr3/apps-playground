@@ -54,3 +54,10 @@
 ### Database Advanced
 - [ ] **Soft Deletes**: Implement a pattern for `deleted_at` across tables
 - [ ] **Complex Relations**: Implement many-to-many relationships and complex joins
+
+### Monorepo & Multi-Package Architecture (Turborepo)
+- [ ] **Workspace Setup**: Migrate to a Turborepo/pnpm workspaces monorepo structure
+- [ ] **Shared Configurations**: Create internal packages for shared ESLint, Prettier, and TypeScript configs
+- [ ] **React Frontend Packages**: Scaffolding shared UI component libraries (e.g., `@repo/ui`) for React apps
+- [ ] **Bun Backend Packages**: Modularize backend logic into shared packages for multiple Bun services
+- [ ] **Shared Schema**: Export Drizzle schemas and Zod types as a shared package for both Frontend & Backend

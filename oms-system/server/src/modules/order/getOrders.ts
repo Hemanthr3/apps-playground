@@ -11,7 +11,7 @@ const getOrders = async (req: Request, res: Response) => {
         orderNumber: orders.orderNumber,
         status: orders.status,
         totalAmount: orders.totalAmount,
-        createdAt: orders.createdAt,
+        createdAt: orders.placedAt,
         customer: {
           firstName: customers.firstName,
           lastName: customers.lastName,
