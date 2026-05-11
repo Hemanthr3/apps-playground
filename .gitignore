@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build outputs
+dist/
+out/
+client/dist/
+server/out/
+
+# Environment files
+.env
+.env.*
+!.env.example
+client/.env
+server/.env
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Bun
+bun.lock
+client/bun.lock
+server/bun.lock
+
+# Database
+server/*.sqlite
+server/*.sqlite-journal
