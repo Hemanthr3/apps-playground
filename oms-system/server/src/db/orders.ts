@@ -22,7 +22,7 @@ export const orders = sqliteTable('orders', {
     .default(0)
     .notNull(),
   totalAmount: real('total_amount').notNull(),
-  placedAt: integer('placed_at', {
+  createdAt: integer('placed_at', {
     mode: 'timestamp',
   })
     .$defaultFn(() => new Date())

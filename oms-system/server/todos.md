@@ -61,3 +61,8 @@
 - [ ] **React Frontend Packages**: Scaffolding shared UI component libraries (e.g., `@repo/ui`) for React apps
 - [ ] **Bun Backend Packages**: Modularize backend logic into shared packages for multiple Bun services
 - [ ] **Shared Schema**: Export Drizzle schemas and Zod types as a shared package for both Frontend & Backend
+
+### Services & Real-time
+- [ ] **Object Storage (S3)**: Implement file storage and retrieval using S3-compatible services (e.g., Minio for local development)
+- [ ] **Email System**: Setup transactional email templates using `react-email` and a provider like `Resend`
+- [ ] **Real-time Communication**: Implement Chat and Notification systems using WebSockets (native Bun or Socket.io)
