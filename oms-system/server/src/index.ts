@@ -1,12 +1,12 @@
 import express from "express"
 import cors from "cors"
-import {drizzle} from "drizzle-orm/bun-sqlite"
+import {drizzle} from "drizzle-orm/node-postgres"
 
 import logger from "../logger";
 import router from "./route";
 
 
-const db = drizzle(process.env.DB_FILE_NAME!)
+const db = drizzle(process.env.DATABASE_URL!)
 const PORT = process.env.PORT || 3000;
 
 const app = express()

@@ -1,31 +1,38 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { pgTable, text, integer, real, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { customers } from "./customers";
 
+export const orders = pgTable('orders', {
+  id: integer('id')
+    .primaryKey()
+    .generatedAlwaysAsIdentity(),
 
-export const orders = sqliteTable('orders', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
   orderNumber: text('order_number')
     .notNull()
     .unique(),
+
   customerId: integer('customer_id')
     .notNull()
     .references(() => customers.id),
+
   status: text('status')
     .default('pending')
     .notNull(),
+
   subtotal: real('subtotal').notNull(),
+
   taxAmount: real('tax_amount')
     .default(0)
     .notNull(),
+
   shippingAmount: real('shipping_amount')
     .default(0)
     .notNull(),
+
   totalAmount: real('total_amount').notNull(),
-  createdAt: integer('placed_at', {
-    mode: 'timestamp',
-  })
-    .$defaultFn(() => new Date())
+
+  placedAt: timestamp('placed_at')
+    .defaultNow()
     .notNull(),
 });
 
