@@ -1,9 +1,12 @@
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import { products } from "./schema";
 
-const sqlite = new Database(process.env.DB_FILE_NAME || "sqlite.db");
-const db = drizzle(sqlite);
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const db = drizzle(pool, { schema: require("./schema") });
 
 async function seed() {
   console.log("Seeding products...");
