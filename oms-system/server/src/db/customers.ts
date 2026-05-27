@@ -5,7 +5,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 export const customers = pgTable('customers', {
   id: integer('id')
     .primaryKey()
-    .generatedAlwaysAsIdentity(),
+    .generatedByDefaultAsIdentity(),
 
   firstName: text('first_name').notNull(),
 

@@ -30,14 +30,14 @@ const createOrder = async (req: Request, res: Response) => {
 
     const result = await db.transaction(async (tx: any) => {
       // 2. Handle Customer (Create if not exists)
-      let customer = await tx
+      let [customer] = await tx
         .select()
         .from(customers)
         .where(eq(customers.email, body.customer.email))
-        .get();
+        .limit(1);
 
       if (!customer) {
-        customer = await tx
+        const [newCustomer] = await tx
           .insert(customers)
           .values({
             firstName: body.customer.firstName,
@@ -45,8 +45,8 @@ const createOrder = async (req: Request, res: Response) => {
             email: body.customer.email,
             phone: body.customer.phone,
           })
-          .returning()
-          .get();
+          .returning();
+        customer = newCustomer;
       }
 
       // 3. Validate Products exist and fetch prices
@@ -54,8 +54,7 @@ const createOrder = async (req: Request, res: Response) => {
       const dbProducts = await tx
         .select()
         .from(products)
-        .where(inArray(products.id, productIds))
-        .all();
+        .where(inArray(products.id, productIds));
 
       if (dbProducts.length !== productIds.length) {
         throw new Error("One or more products not found");
@@ -77,7 +76,7 @@ const createOrder = async (req: Request, res: Response) => {
       const totalAmount = subtotal + (body.shippingAmount || 0) + (body.taxAmount || 0);
 
       // 5. Create Order
-      const order = await tx
+      const [order] = await tx
         .insert(orders)
         .values({
           orderNumber: `ORD-${Date.now()}`,
@@ -88,8 +87,7 @@ const createOrder = async (req: Request, res: Response) => {
           shippingAmount: body.shippingAmount || 0,
           totalAmount,
         })
-        .returning()
-        .get();
+        .returning();
 
       // 6. Create Order Line Items
       await tx.insert(orderLineItems).values(

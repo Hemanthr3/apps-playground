@@ -5,7 +5,7 @@ import { customers } from "./customers";
 export const orders = pgTable('orders', {
   id: integer('id')
     .primaryKey()
-    .generatedAlwaysAsIdentity(),
+    .generatedByDefaultAsIdentity(),
 
   orderNumber: text('order_number')
     .notNull()

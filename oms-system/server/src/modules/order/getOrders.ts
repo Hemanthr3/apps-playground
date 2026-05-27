@@ -5,22 +5,32 @@ import { eq } from "drizzle-orm";
 
 const getOrders = async (req: Request, res: Response) => {
   try {
-    const data = await db
+    const rows = await db
       .select({
         id: orders.id,
         orderNumber: orders.orderNumber,
         status: orders.status,
         totalAmount: orders.totalAmount,
-        createdAt: orders.createdAt,
-        customer: {
-          firstName: customers.firstName,
-          lastName: customers.lastName,
-          email: customers.email,
-        },
+        createdAt: orders.placedAt,
+        customerFirstName: customers.firstName,
+        customerLastName: customers.lastName,
+        customerEmail: customers.email,
       })
       .from(orders)
-      .leftJoin(customers, eq(orders.customerId, customers.id))
-      .all();
+      .leftJoin(customers, eq(orders.customerId, customers.id));
+
+    const data = rows.map((row) => ({
+      id: row.id,
+      orderNumber: row.orderNumber,
+      status: row.status,
+      totalAmount: row.totalAmount,
+      createdAt: row.createdAt,
+      customer: row.customerEmail ? {
+        firstName: row.customerFirstName,
+        lastName: row.customerLastName,
+        email: row.customerEmail,
+      } : null,
+    }));
 
     return res.status(200).json({
       success: true,

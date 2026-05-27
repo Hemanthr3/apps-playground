@@ -7,7 +7,7 @@ import { products } from "./products";
 export const orderLineItems = pgTable('order_line_items', {
   id: integer('id')
     .primaryKey()
-    .generatedAlwaysAsIdentity(),
+    .generatedByDefaultAsIdentity(),
 
   orderId: integer('order_id')
     .notNull()

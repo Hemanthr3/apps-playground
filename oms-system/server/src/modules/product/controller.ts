@@ -4,7 +4,7 @@ import { products } from "../../db/schema";
 
 const getProducts = async (req: Request, res: Response) => {
   try {
-    const data = await db.select().from(products).all();
+    const data = await db.select().from(products);
     return res.status(200).json({
       success: true,
       data,
