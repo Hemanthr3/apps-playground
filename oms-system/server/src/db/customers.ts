@@ -15,6 +15,8 @@ export const customers = pgTable('customers', {
 
   phone: text('phone'),
 
+  profilePhotoKey: text('profile_photo_key'),
+
   createdAt: timestamp('created_at')
     .defaultNow()
     .notNull(),

@@ -34,17 +34,12 @@ GET http://localhost:8000/api/customer
 GET http://localhost:8000/api/product
 
 ### Upload Profile Photo
-POST http://localhost:8000/api/customer/profile-upload
+POST http://localhost:8000/api/customer/profile-upload/1
 Content-Type: multipart/form-data; boundary=----FormBoundary
 
 ------FormBoundary
-Content-Disposition: form-data; name="id"
+Content-Disposition: form-data; name="uploaded_file"; filename="photo.png"
+Content-Type: image/png
 
-123
-------FormBoundary
-Content-Disposition: form-data; name="uploaded_file"; filename="photo.jpg"
-Content-Type: image/jpeg
-
-/Users/hemanthr/Desktop/Screenshot 2026-05-27 at 5.05.24 PM.png
+< /Users/hemanthr/Desktop/Screenshot 2026-06-01 at 11.59.52 PM.png
 ------FormBoundary--
-
