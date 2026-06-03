@@ -25,7 +25,7 @@
 ## ⏳ Pending Tasks
 
 ### Core Features
-- [ ] **File Handling**: Accept multipart form-data (CSV, XLSX, Images, Video) using Multer/Busboy
+- [x] **File Handling**: Accept multipart form-data (CSV, XLSX, Images, Video) using Multer/Busboy
 - [ ] **Streaming**: Implement streaming responses for large content
 - [ ] **Background Jobs**: Workers and Queues using BullMQ and Redis
 - [ ] **Batch Processing**: Write and schedule batch jobs/cron tasks
@@ -63,6 +63,6 @@
 - [ ] **Shared Schema**: Export Drizzle schemas and Zod types as a shared package for both Frontend & Backend
 
 ### Services & Real-time
-- [ ] **Object Storage (S3)**: Implement file storage and retrieval using S3-compatible services (e.g., Minio for local development)
+- [x] **Object Storage (S3)**: Implement file storage and retrieval using S3-compatible services (e.g., Minio for local development)
 - [ ] **Email System**: Setup transactional email templates using `react-email` and a provider like `Resend`
 - [ ] **Real-time Communication**: Implement Chat and Notification systems using WebSockets (native Bun or Socket.io)

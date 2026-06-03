@@ -17,4 +17,16 @@ export const uploadProfilePhoto = (customerId: number, file: File) => {
   return api.post(`/customer/profile-upload/${customerId}`, formData).then(res => res.data);
 };
 
+export const importProducts = (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return api.post('/product/import', formData).then(res => res.data);
+};
+
+export const importProductsXlsx = (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return api.post('/product/import-xlsx', formData).then(res => res.data);
+};
+
 export default api;
