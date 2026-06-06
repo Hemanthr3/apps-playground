@@ -1,3 +1,21 @@
+### Register
+POST http://localhost:8000/api/auth/register
+Content-Type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "password123"
+}
+
+### Login
+POST http://localhost:8000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@test.com",
+    "password": "password123"
+}
+
 ### Health Check
 GET http://localhost:8000/health
 
@@ -29,6 +47,7 @@ Content-Type: application/json
 
 ### Get Customers
 GET http://localhost:8000/api/customer
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzgwNzI3NzI3LCJleHAiOjE3ODEzMzI1Mjd9.3MTdOhVx7kbF6IsFM0_xxnMsDRtIwBNWYaQkk8-9Z1Q
 
 ### Get Products
 GET http://localhost:8000/api/product

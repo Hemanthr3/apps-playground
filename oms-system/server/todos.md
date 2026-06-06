@@ -12,7 +12,7 @@
 - [x] Scaffolding a Bun runtime project
 - [x] Scaffolding an Express app in Bun using TypeScript
 - [x] Environment variable (`.env`) setup and validation
-- [x] Pino JSON logger integration
+- [x] Pino JSON logger integration — with pino-http, pino-pretty for dev, custom log levels by HTTP status code
 - [x] Drizzle ORM setup (Schema generation & Migrations)
 - [x] Drizzle Studio for SQLite management
 - [x] Zod schema inference from Drizzle for automated validation
@@ -41,7 +41,7 @@
 ## 🚀 Recommended Additions (Missing)
 
 ### Security & Production Readiness
-- [ ] **Authentication**: Implement JWT or Session-based auth (e.g., Lucia or Passport)
+- [x] **Authentication**: Implement JWT or Session-based auth (e.g., Lucia or Passport) — built from scratch using `jose` + `bcryptjs` + HttpOnly cookies
 - [ ] **Authorization**: Role-based access control (RBAC)
 - [ ] **Global Error Handling**: Implement a centralized error-handling middleware
 - [ ] **Security Headers**: Setup `helmet` and CORS policies
