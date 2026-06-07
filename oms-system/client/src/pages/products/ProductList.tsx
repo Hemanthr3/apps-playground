@@ -1,6 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getProducts, importProducts, importProductsXlsx } from '@/lib/api';
+import { getProducts, importProducts, importProductsXlsx, getJobStatus } from '@/lib/api';
+import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,22 +12,61 @@ export default function ProductList() {
   const csvInputRef = useRef<HTMLInputElement>(null);
   const xlsxInputRef = useRef<HTMLInputElement>(null);
 
+  // jobId is set after a successful XLSX upload — triggers polling
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['products'],
     queryFn: getProducts,
   });
 
-  const onSuccess = (result: any) => {
-    queryClient.invalidateQueries({ queryKey: ['products'] });
-    alert(`Successfully imported ${result.inserted} products`);
-  };
+  // Poll job status every 2 seconds while activeJobId is set
+  const { data: jobData } = useQuery({
+    queryKey: ['job', activeJobId],
+    queryFn: () => getJobStatus(activeJobId!),
+    enabled: !!activeJobId,
+    refetchInterval: (query) => {
+      const state = query.state.data?.state;
+      if (state === 'completed' || state === 'failed') return false;
+      return 2000;
+    },
+  });
 
-  const onError = (error: any) => {
-    alert(`Import failed: ${error.response?.data?.message || error.message}`);
-  };
+  // React to job completion — side effects belong in useEffect, not select
+  useEffect(() => {
+    if (!jobData) return;
+    if (jobData.state === 'completed') {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      setActiveJobId(null);
+      alert(`Import complete — ${jobData.result?.inserted ?? 0} products inserted`);
+    }
+    if (jobData.state === 'failed') {
+      setActiveJobId(null);
+      alert(`Import failed: ${jobData.error}`);
+    }
+  }, [jobData?.state]);
 
-  const csvMutation = useMutation({ mutationFn: importProducts, onSuccess, onError });
-  const xlsxMutation = useMutation({ mutationFn: importProductsXlsx, onSuccess, onError });
+  const csvMutation = useMutation({
+    mutationFn: importProducts,
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      alert(`Successfully imported ${result.inserted} products`);
+    },
+    onError: (error: any) => {
+      alert(`Import failed: ${error.response?.data?.message || error.message}`);
+    },
+  });
+
+  const xlsxMutation = useMutation({
+    mutationFn: importProductsXlsx,
+    onSuccess: (result) => {
+      // Don't refresh immediately — wait for the job to complete via polling
+      setActiveJobId(result.jobId);
+    },
+    onError: (error: any) => {
+      alert(`Import failed: ${error.response?.data?.message || error.message}`);
+    },
+  });
 
   const handleCsvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -42,6 +82,9 @@ export default function ProductList() {
     e.target.value = '';
   };
 
+  const jobState = jobData?.state;
+  const isJobRunning = !!activeJobId && jobState !== 'completed' && jobState !== 'failed';
+
   if (isLoading) return <div>Loading products...</div>;
   if (error) return <div>Error loading products</div>;
 
@@ -51,7 +94,16 @@ export default function ProductList() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          {/* Job progress indicator */}
+          {isJobRunning && (
+            <div className="flex items-center gap-2 min-w-48">
+              <Progress value={typeof jobData?.progress === 'number' ? jobData.progress : 0} className="h-2" />
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
+                {typeof jobData?.progress === 'number' ? jobData.progress : 0}%
+              </span>
+            </div>
+          )}
           <Button
             variant="outline"
             onClick={() => csvInputRef.current?.click()}
@@ -61,9 +113,9 @@ export default function ProductList() {
           </Button>
           <Button
             onClick={() => xlsxInputRef.current?.click()}
-            disabled={xlsxMutation.isPending}
+            disabled={xlsxMutation.isPending || isJobRunning}
           >
-            {xlsxMutation.isPending ? 'Importing...' : 'Import XLSX'}
+            {xlsxMutation.isPending ? 'Queuing...' : isJobRunning ? 'Processing...' : 'Import XLSX'}
           </Button>
         </div>
       </div>

@@ -24,10 +24,10 @@ app.use(pinoHttp({
   customErrorMessage: (req, res) => {
     return `${req.method} ${req.url} ${res.statusCode}`
   },
-  // Strip out noisy fields
+  // Only log method + url on req, statusCode on res — nothing else
   serializers: {
-    req: (req) => ({ method: req.method, url: req.url }),
-    res: (res) => ({ statusCode: res.statusCode }),
+    req: (req) => `${req.method} ${req.url}`,
+    res: (res) => `${res.statusCode}`,
   },
 }))
 // credentials: true allows cookies to be sent cross-origin (frontend on 5173, backend on 8000)

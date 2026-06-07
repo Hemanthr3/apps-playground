@@ -49,4 +49,7 @@ export const importProductsXlsx = (file: File) => {
   return api.post('/product/import-xlsx', formData).then(res => res.data);
 };
 
+export const getJobStatus = (jobId: string) =>
+  api.get(`/product/import-xlsx/status/${jobId}`).then(res => res.data);
+
 export default api;
