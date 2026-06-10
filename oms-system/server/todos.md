@@ -27,7 +27,7 @@
 ### Core Features
 - [x] **File Handling**: Accept multipart form-data (CSV, XLSX, Images, Video) using Multer/Busboy
 - [ ] **Streaming**: Implement streaming responses for large content
-- [ ] **Background Jobs**: Workers and Queues using BullMQ and Redis
+- [x] **Background Jobs**: Workers and Queues using BullMQ and Redis
 - [ ] **Batch Processing**: Write and schedule batch jobs/cron tasks
 
 ### Infrastructure & DevOps
