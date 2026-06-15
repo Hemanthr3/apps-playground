@@ -1,11 +1,12 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
 import { users, insertUserSchema } from "../../db/schema";
 import { signToken } from "../../lib/auth";
+import { AppError } from "../../lib/errors";
 
-const register = async (req: Request, res: Response) => {
+const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Validate input using the Zod schema generated from your Drizzle table.
     // .pick() selects only the fields we care about for registration.
@@ -20,7 +21,7 @@ const register = async (req: Request, res: Response) => {
     // Check if email is already taken — same Drizzle pattern as your other controllers
     const existing = await db.select().from(users).where(eq(users.email, email));
     if (existing.length > 0) {
-      return res.status(409).json({ success: false, message: "Email already registered" });
+      throw new AppError(409, "Email already registered")
     }
 
     // Hash before storing — bcrypt adds a random salt automatically
@@ -33,14 +34,14 @@ const register = async (req: Request, res: Response) => {
       .returning();
 
     if (!user) {
-      return res.status(500).json({ success: false, message: "Failed to create user" });
+      throw new AppError(500, "Failed to create user")
     }
 
     const token = await signToken({ id: user.id, email: user.email });
 
     return res.status(201).json({ success: true, token });
   } catch (error: any) {
-    return res.status(500).json({ success: false, message: error.message });
+    return next(error);
   }
 };
 

@@ -1,9 +1,9 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { db } from "../../db";
 import { orders, customers } from "../../db/schema";
 import { eq } from "drizzle-orm";
 
-const getOrders = async (req: Request, res: Response) => {
+const getOrders = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const rows = await db
       .select({
@@ -32,12 +32,9 @@ const getOrders = async (req: Request, res: Response) => {
       } : null,
     }));
 
-    return res.status(200).json({
-      success: true,
-      data,
-    });
-  } catch (error: any) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error)
   }
 };
 

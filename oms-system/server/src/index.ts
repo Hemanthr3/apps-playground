@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser"
 import pinoHttp from "pino-http"
 import logger from "../logger";
 import router from "./route";
+import errorHandler from "./middleware/errorHandler";
 
 const PORT = process.env.PORT || 3000;
 
@@ -41,6 +42,8 @@ app.use('/api', router)
 app.get('/health', (req, res) => {
   return res.json({ message: "server is healthy!" })
 })
+
+app.use(errorHandler)
 
 app.listen(PORT, () => {
   logger.info(`server is up ${PORT}`)

@@ -1,10 +1,11 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import * as XLSX from "xlsx";
 import { db } from "../../db";
 import { products } from "../../db/schema";
 import { sql } from "drizzle-orm";
+import { AppError } from "../../lib/errors";
 
-const importProducts = async (req: Request, res: Response) => {
+const importProducts = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.file) {
     return res.status(400).json({ success: false, message: "No file uploaded" });
   }
@@ -12,13 +13,10 @@ const importProducts = async (req: Request, res: Response) => {
   try {
     const workbook = XLSX.read(req.file.buffer, { type: "buffer" });
     const sheetName = workbook.SheetNames[0];
-    if (!sheetName) {
-      return res.status(400).json({ success: false, message: "Spreadsheet has no sheets" });
-    }
+    if (!sheetName) throw new AppError(400, "Spreadsheet has no sheets")
+
     const sheet = workbook.Sheets[sheetName];
-    if (!sheet) {
-      return res.status(400).json({ success: false, message: "Could not read sheet" });
-    }
+    if (!sheet) throw new AppError(400, "Could not read sheet")
 
     const rows = XLSX.utils.sheet_to_json(sheet) as any[];
 
@@ -31,9 +29,6 @@ const importProducts = async (req: Request, res: Response) => {
       isActive: row.isActive === true || row.isActive === "true",
     }));
 
-    // onConflictDoUpdate = upsert: if a row with the same SKU already exists,
-    // update it instead of throwing a duplicate key error.
-    // This makes the import idempotent — safe to run multiple times.
     const inserted = await db
       .insert(products)
       .values(toInsert)
@@ -49,13 +44,9 @@ const importProducts = async (req: Request, res: Response) => {
       })
       .returning();
 
-    return res.status(200).json({
-      success: true,
-      inserted: inserted.length,
-      data: inserted,
-    });
-  } catch (error: any) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(200).json({ success: true, inserted: inserted.length, data: inserted });
+  } catch (error) {
+    next(error)
   }
 };
 

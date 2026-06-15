@@ -1,9 +1,9 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { eq, inArray } from "drizzle-orm";
-import { orders, customers, products, orderLineItems, insertOrderSchema } from "../../db/schema";
+import { orders, customers, products, orderLineItems } from "../../db/schema";
 import { db } from "../../db";
 import { z } from "zod";
-
+import { AppError } from "../../lib/errors";
 
 const createOrderBodySchema = z.object({
   customer: z.object({
@@ -22,14 +22,11 @@ const createOrderBodySchema = z.object({
   taxAmount: z.number().optional().default(0),
 });
 
-const createOrder = async (req: Request, res: Response) => {
+const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
-
-    // 1. Validate request body
     const body = createOrderBodySchema.parse(req.body);
 
     const result = await db.transaction(async (tx: any) => {
-      // 2. Handle Customer (Create if not exists)
       let [customer] = await tx
         .select()
         .from(customers)
@@ -49,7 +46,6 @@ const createOrder = async (req: Request, res: Response) => {
         customer = newCustomer;
       }
 
-      // 3. Validate Products exist and fetch prices
       const productIds = body.items.map((i) => i.productId);
       const dbProducts = await tx
         .select()
@@ -57,25 +53,19 @@ const createOrder = async (req: Request, res: Response) => {
         .where(inArray(products.id, productIds));
 
       if (dbProducts.length !== productIds.length) {
-        throw new Error("One or more products not found");
+        throw new AppError(404, "One or more products not found")
       }
 
-      // 4. Calculate totals
       let subtotal = 0;
       const itemsWithPrices = body.items.map((item) => {
-        const product = dbProducts.find((p:any) => p.id === item.productId)!;
+        const product = dbProducts.find((p: any) => p.id === item.productId)!;
         const totalPrice = product.price * item.quantity;
         subtotal += totalPrice;
-        return {
-          ...item,
-          unitPrice: product.price,
-          totalPrice,
-        };
+        return { ...item, unitPrice: product.price, totalPrice };
       });
 
       const totalAmount = subtotal + (body.shippingAmount || 0) + (body.taxAmount || 0);
 
-      // 5. Create Order
       const [order] = await tx
         .insert(orders)
         .values({
@@ -89,7 +79,6 @@ const createOrder = async (req: Request, res: Response) => {
         })
         .returning();
 
-      // 6. Create Order Line Items
       await tx.insert(orderLineItems).values(
         itemsWithPrices.map((item) => ({
           orderId: order.id,
@@ -103,20 +92,12 @@ const createOrder = async (req: Request, res: Response) => {
       return order;
     });
 
-    return res.status(201).json({
-      success: true,
-      message: "Order created successfully",
-      data: result,
-    });
-  } catch (error: any) {
-    console.error("Order creation failed:", error);
+    return res.status(201).json({ success: true, message: "Order created successfully", data: result });
+  } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ success: false, message: "Validation failed", errors: error.issues });
     }
-    return res.status(500).json({
-      success: false,
-      message: error.message || "Internal server error",
-    });
+    next(error)
   }
 };
 

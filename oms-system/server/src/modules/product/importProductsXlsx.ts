@@ -1,19 +1,19 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "../../lib/storage";
 import { productImportQueue } from "../../lib/queue";
+import { AppError } from "../../lib/errors";
 
-const importProductsXlsx = async (req: Request, res: Response) => {
+const importProductsXlsx = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.file) {
-    return res.status(400).json({ success: false, message: "No file uploaded" });
+    throw new AppError(400, "No file uploaded")
   }
 
   if (req.file.mimetype !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-    return res.status(400).json({ success: false, message: "Only .xlsx files are accepted" });
+    throw new AppError(400, "Only .xlsx files are accepted")
   }
 
   try {
-    // Step 1: Store the file in MinIO
     const key = `imports/products/${Date.now()}.xlsx`;
 
     await s3.send(
@@ -25,8 +25,6 @@ const importProductsXlsx = async (req: Request, res: Response) => {
       })
     );
 
-    // Step 2: Add a job to the queue — worker picks it up and processes in background
-    // 202 Accepted means "request received, processing not yet complete"
     const job = await productImportQueue.add("import", { fileKey: key });
 
     return res.status(202).json({
@@ -35,8 +33,8 @@ const importProductsXlsx = async (req: Request, res: Response) => {
       jobId: job.id,
       storedAt: key,
     });
-  } catch (error: any) {
-    return res.status(500).json({ success: false, message: error.message });
+  } catch (error) {
+    next(error)
   }
 };
 
