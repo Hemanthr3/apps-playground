@@ -43,7 +43,7 @@
 ### Security & Production Readiness
 - [x] **Authentication**: Implement JWT or Session-based auth (e.g., Lucia or Passport) — built from scratch using `jose` + `bcryptjs` + HttpOnly cookies
 - [ ] **Authorization**: Role-based access control (RBAC)
-- [ ] **Global Error Handling**: Implement a centralized error-handling middleware
+- [x] **Global Error Handling**: Implement a centralized error-handling middleware — AppError class + 4-arg Express error handler
 - [ ] **Security Headers**: Setup `helmet` and CORS policies
 - [ ] **Rate Limiting**: Protect APIs from brute force/abuse
 

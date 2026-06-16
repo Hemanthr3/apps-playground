@@ -5,6 +5,7 @@ import pinoHttp from "pino-http"
 import logger from "../logger";
 import router from "./route";
 import errorHandler from "./middleware/errorHandler";
+import helmet from "helmet"
 
 const PORT = process.env.PORT || 3000;
 
@@ -31,6 +32,7 @@ app.use(pinoHttp({
     res: (res) => `${res.statusCode}`,
   },
 }))
+app.use(helmet())
 // credentials: true allows cookies to be sent cross-origin (frontend on 5173, backend on 8000)
 app.use(cors({ origin: "http://localhost:5173", credentials: true }))
 app.use(express.json())
