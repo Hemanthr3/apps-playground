@@ -34,7 +34,7 @@ app.use(pinoHttp({
 }))
 app.use(helmet())
 // credentials: true allows cookies to be sent cross-origin (frontend on 5173, backend on 8000)
-app.use(cors({ origin: "http://localhost:5173", credentials: true }))
+app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173", credentials: true }))
 app.use(express.json())
 // cookieParser reads req.cookies from incoming requests
 app.use(cookieParser())

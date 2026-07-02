@@ -3,7 +3,7 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { db } from "../../db";
 import { customers } from "../../db/schema";
-import { s3 } from "../../lib/storage";
+import { s3Public } from "../../lib/storage";
 
 const getCustomers = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -16,7 +16,7 @@ const getCustomers = async (req: Request, res: Response, next: NextFunction) => 
         }
 
         const url = await getSignedUrl(
-          s3,
+          s3Public,
           new GetObjectCommand({
             Bucket: process.env.MINIO_BUCKET!,
             Key: customer.profilePhotoKey,

@@ -31,7 +31,7 @@
 - [ ] **Batch Processing**: Write and schedule batch jobs/cron tasks
 
 ### Infrastructure & DevOps
-- [ ] **Dockerization**: Create optimized multi-stage Dockerfiles
+- [x] **Dockerization**: Create optimized multi-stage Dockerfiles
 - [ ] **CI/CD**: Setup GitHub Actions for automated testing and deployment
 - [ ] **APM & Monitoring**: Setup OpenTelemetry or Elastic APM for tracing and metrics
 - [ ] **Deployment**: Host the app on Render/Railway/Fly.io
@@ -44,8 +44,8 @@
 - [x] **Authentication**: Implement JWT or Session-based auth (e.g., Lucia or Passport) — built from scratch using `jose` + `bcryptjs` + HttpOnly cookies
 - [ ] **Authorization**: Role-based access control (RBAC)
 - [x] **Global Error Handling**: Implement a centralized error-handling middleware — AppError class + 4-arg Express error handler
-- [ ] **Security Headers**: Setup `helmet` and CORS policies
-- [ ] **Rate Limiting**: Protect APIs from brute force/abuse
+- [x] **Security Headers**: Setup `helmet` and CORS policies
+- [x] **Rate Limiting**: Protect APIs from brute force/abuse
 
 ### Quality Assurance
 - [ ] **Testing**: Setup Vitest or Jest for Unit and Integration tests

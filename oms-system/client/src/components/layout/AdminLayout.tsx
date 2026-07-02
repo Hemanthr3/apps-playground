@@ -35,7 +35,11 @@ function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { data: meData } = useQuery({ queryKey: ['me'], queryFn: getMe });
+  const { data: meData } = useQuery({
+    queryKey: ['me'],
+    queryFn: getMe,
+    staleTime: 5 * 60 * 1000, // cache for 5 minutes — no need to refetch on every mount
+  });
   const email = (meData?.user?.email as string) ?? '';
   const initials = email.slice(0, 2).toUpperCase();
 

@@ -8,8 +8,8 @@ import { authLimiter } from "./middleware/rateLimiter";
 
 const router = Router();
 
-// Public routes — rate limited to prevent brute force
-router.use("/auth", authLimiter, authRouter);
+// Public routes — rate limiter applied per-route inside authRouter
+router.use("/auth", authRouter);
 
 // Protected routes — authenticate middleware runs before every handler in these routers
 router.use("/order", authenticate, orderRouter);
